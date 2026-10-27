@@ -208,7 +208,7 @@ No installs and no build step.
 
 **S.S. Manikanda Prabu**, B.Tech CSE, SRM Institute of Science and Technology, Ramapuram
 
-[GitHub](https://github.com/YOUR-USERNAME) · [LinkedIn](https://linkedin.com/in/YOUR-PROFILE)
+[GitHub](https://github.com/YOUR-USERNAME) · [LinkedIn](https://www.linkedin.com/in/s-s-manikanda-prabu-40070b325/)
 
 ## License
 
