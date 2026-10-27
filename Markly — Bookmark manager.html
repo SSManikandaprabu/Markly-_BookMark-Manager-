@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Markly — Bookmark Manager</title>
+<meta name="description" content="Save, organise and find your links. Folders, tags, favorites, instant search and backup, all private in your browser.">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5fb;--ink:#0f1424;--mut:#5f6881;--card:#fff;--line:#e0e5f2;--ac:#5b5bf0;--acs:#ececff;--on:#fff;--ok:#16a06a;--bad:#d9382c;--star:#f5a623;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0f1c;--ink:#eef0fb;--mut:#98a1c2;--card:#141932;--line:#252c4f;--ac:#8587ff;--acs:#222657;--on:#0c0f1c;--ok:#4ed59f;--bad:#ff7b6e}}
+:root[data-theme="dark"]{--bg:#0c0f1c;--ink:#eef0fb;--mut:#98a1c2;--card:#141932;--line:#252c4f;--ac:#8587ff;--acs:#222657;--on:#0c0f1c;--ok:#4ed59f;--bad:#ff7b6e}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.5 Inter,system-ui,sans-serif;min-height:100svh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:70}
+h1,h2,h3,.pj{font-family:"Plus Jakarta Sans",Inter,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;gap:12px;align-items:center}
+.logo{font:800 22px "Plus Jakarta Sans",sans-serif;letter-spacing:-.03em;display:flex;align-items:center;gap:8px}.logo i{width:26px;height:26px;border-radius:8px;background:var(--ac);display:grid;place-items:center;color:var(--on);font-style:normal;font-size:15px}
+.search{flex:1;position:relative;max-width:560px;margin:0 auto}.search input{width:100%;padding:11px 44px 11px 40px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg)}.search:before{content:"⌕";position:absolute;left:14px;top:7px;font-size:20px;color:var(--mut)}.search kbd{position:absolute;right:12px;top:9px;font:600 12px Inter;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--mut)}
+.btn{border:0;border-radius:12px;padding:10px 18px;font-weight:600;cursor:pointer;background:var(--ac);color:var(--on)}.btn:hover{filter:brightness(1.08)}
+.btn.g{background:var(--acs);color:var(--ac)}.ib{background:none;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;color:var(--ink);font-weight:600}.ib:hover{border-color:var(--ac)}
+.layout{max-width:1280px;margin:0 auto;padding:20px;display:grid;grid-template-columns:240px 1fr;gap:22px;align-items:start}
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 80px)}
+aside h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:18px 0 8px}aside h3:first-child{margin-top:0}
+.nav{display:flex;flex-direction:column;gap:2px}
+.ni{display:flex;justify-content:space-between;gap:8px;background:none;border:0;border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;font-weight:500;color:var(--ink)}.ni:hover{background:var(--acs)}.ni[aria-pressed="true"]{background:var(--ac);color:var(--on)}.ni span:last-child{opacity:.7;font-size:13px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}.tg{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:13px;cursor:pointer;color:var(--ink)}.tg[aria-pressed="true"],.tg:hover{background:var(--acs);border-color:var(--ac);color:var(--ac)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.head h2{font-size:26px;font-weight:800;letter-spacing:-.02em}.head small{color:var(--mut);display:block;font:400 14px Inter}
+.ctl{display:flex;gap:8px;align-items:center}select{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.grid.list{grid-template-columns:1fr}
+.c{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:9px;transition:transform .2s,box-shadow .2s,border-color .2s}
+.c:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(20,25,60,.12);border-color:var(--ac)}
+.top{display:flex;gap:12px;align-items:center}.av{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;font:800 18px "Plus Jakarta Sans",sans-serif}
+.top a{flex:1;min-width:0;color:inherit;text-decoration:none}.top b{display:block;font:700 16px "Plus Jakarta Sans",sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top small{color:var(--mut);font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.star{background:none;border:0;font-size:22px;cursor:pointer;color:var(--mut);line-height:1;padding:2px}.star[aria-pressed="true"]{color:var(--star)}
+.c p{color:var(--mut);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cf{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;flex-wrap:wrap}.cf .tags{gap:4px}.cf .tg{font-size:12px;padding:2px 9px}
+.ac2{display:flex;gap:2px;align-items:center;color:var(--mut);font-size:12px}.ac2 button{background:none;border:0;cursor:pointer;color:var(--mut);padding:4px 7px;border-radius:7px;font-size:13px}.ac2 button:hover{background:var(--acs);color:var(--ac)}.ac2 button.dl:hover{background:none;color:var(--bad)}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--mut);background:var(--card);border:1.5px dashed var(--line);border-radius:20px}.empty b{display:block;font:800 22px "Plus Jakarta Sans",sans-serif;color:var(--ink);margin-bottom:6px}
+dialog{border:0;border-radius:22px;padding:0;width:calc(100% - 28px);max-width:500px;background:var(--card);color:var(--ink)}dialog::backdrop{background:rgba(8,10,25,.6);backdrop-filter:blur(3px)}
+.dg{padding:24px;display:grid;gap:13px}.dg h3{font-size:22px}label{font-weight:600;font-size:13px;display:grid;gap:5px}
+input,textarea,.dg select{background:var(--bg);border:1.5px solid var(--line);border-radius:11px;padding:11px 12px;width:100%;min-width:0}textarea{resize:vertical;min-height:84px}
+.er{color:var(--bad);font-size:13px;min-height:18px}.row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:14px;font-size:14px;transition:transform .35s;z-index:80;display:flex;gap:14px;align-items:center}.toast.s{transform:translate(-50%,0)}.toast button{background:none;border:0;color:var(--ac);font-weight:700;cursor:pointer}
+@media (max-width:860px){.layout{grid-template-columns:1fr;padding:14px}aside{position:static}.nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}.ni{white-space:nowrap;gap:10px}aside h3:nth-of-type(n+2){margin-top:14px}.search kbd{display:none}.logo span{display:none}.bar{padding:10px 14px}}
+@media (prefers-reduced-motion:reduce){.c,.toast{transition:none}}
+</style>
+</head>
+<body>
+<header><div class="bar"><div class="logo"><i>★</i><span>Markly</span></div>
+<div class="search"><input id="q" type="search" placeholder="Search title, link, notes or tag" aria-label="Search bookmarks"><kbd>/</kbd></div>
+<button class="ib" id="bk" aria-label="Backup and import">Backup</button><button class="ib" id="th" aria-label="Toggle theme">Theme</button><button class="btn" id="add">+ Add</button></div></header>
+
+<div class="layout">
+<aside><h3>Library</h3><div class="nav" id="nv"></div><h3>Folders</h3><div class="nav" id="fd"></div><h3>Tags</h3><div class="tags" id="tg"></div></aside>
+<main><div class="head"><div><h2 id="ttl">All bookmarks</h2><small id="cnt"></small></div>
+<div class="ctl"><select id="so" aria-label="Sort"><option value="new">Newest</option><option value="old">Oldest</option><option value="az">A to Z</option><option value="vis">Most visited</option></select><button class="ib" id="vw" aria-label="Switch layout">List</button></div></div>
+<div class="grid" id="gr"></div></main></div>
+
+<dialog id="dlg"><form class="dg" id="fm" novalidate><h3 id="dt">Add bookmark</h3>
+<label>Link *<input id="fu" placeholder="example.com/article" inputmode="url" autocomplete="off"></label>
+<label>Title<input id="ft" placeholder="Leave blank to use the site name"></label>
+<label>Folder<input id="ff" list="fl" placeholder="e.g. Learning"><datalist id="fl"></datalist></label>
+<label>Tags (comma separated)<input id="fg" placeholder="css, reference"></label>
+<label>Notes<textarea id="fn" placeholder="Why did you save this?"></textarea></label>
+<div class="er" id="er" role="alert"></div><div class="row"><button class="ib" type="button" data-x>Cancel</button><button class="btn" type="submit">Save</button></div></form></dialog>
+
+<dialog id="bd"><div class="dg"><h3>Backup and import</h3><p style="color:var(--mut);font-size:14px">Copy this text to back up. To restore, paste a backup here or choose a file, then import. Duplicates are skipped.</p><textarea id="bt" style="min-height:170px;font:12px/1.4 monospace" aria-label="Backup data"></textarea><div class="er" id="be" role="alert"></div>
+<div class="row"><button class="ib" data-x>Close</button><button class="ib" id="bf">Import file</button><button class="ib" id="bi">Import text</button><button class="ib" id="bd2">Download</button><button class="btn" id="bc">Copy</button></div><input type="file" id="fi" accept=".json,application/json" hidden></div></dialog>
+<div class="toast" id="ts" role="status"><span id="tm"></span><button id="tu" hidden>Undo</button></div>
+
+<script>
+const $=i=>document.getElementById(i);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY="markly-v1";let B=[],V={nav:"all",folder:"",tag:"",q:"",sort:"new",list:false},ed=null,undo=null,tt;
+const d0=Date.now(),day=864e5;
+const SEED=[["https://developer.mozilla.org/","MDN Web Docs","Learning","reference, web","The go-to documentation for HTML, CSS and JavaScript."],["https://github.com/","GitHub","Dev","code, tools","Host your code, track issues and collaborate."],["https://stackoverflow.com/","Stack Overflow","Dev","help, q&a","Find answers to programming questions."],["https://caniuse.com/","Can I use","Tools","css, reference","Browser support tables for web features."],["https://roadmap.sh/","Developer Roadmaps","Learning","career, roadmap","Step-by-step guides to learn a developer path."]];
+try{B=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){B=null}
+if(!Array.isArray(B)){B=SEED.map((s,i)=>({id:"s"+i,url:s[0],title:s[1],folder:s[2],tags:s[3].split(", "),desc:s[4],fav:i===0,visits:0,added:d0-i*day,last:0}));save()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(B))}catch(e){}}
+function norm(u){u=u.trim();if(!u)return null;if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(u))u="https://"+u;try{const x=new URL(u);if(!/^https?:$/.test(x.protocol)||!x.hostname.includes("."))return null;return x}catch(e){return null}}
+const key=x=>x.hostname.replace(/^www\./,"").toLowerCase()+x.pathname.replace(/\/$/,"")+x.search;
+const host=u=>{try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return u}};
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+function toast(m,u){$("tm").textContent=m;$("tu").hidden=!u;undo=u||null;$("ts").classList.add("s");clearTimeout(tt);tt=setTimeout(()=>{$("ts").classList.remove("s");undo=null},u?5000:2000)}
+$("tu").onclick=()=>{if(undo)undo();undo=null;$("ts").classList.remove("s")};
+
+function render(){
+  const folders=[...new Set(B.map(b=>b.folder).filter(Boolean))].sort(),tags={};B.forEach(b=>b.tags.forEach(t=>tags[t]=(tags[t]||0)+1));
+  const nav=(a,l,n,p)=>`<button class="ni" ${a} aria-pressed="${p}"><span>${l}</span><span>${n}</span></button>`;
+  $("nv").innerHTML=nav('data-n="all"',"All bookmarks",B.length,V.nav==="all"&&!V.folder&&!V.tag)+nav('data-n="fav"',"★ Favorites",B.filter(b=>b.fav).length,V.nav==="fav")+nav('data-n="rec"',"Recently visited",B.filter(b=>b.last).length,V.nav==="rec");
+  $("fd").innerHTML=folders.length?folders.map(f=>nav(`data-f="${esc(f)}"`,esc(f),B.filter(b=>b.folder===f).length,V.folder===f)).join(""):'<span style="color:var(--mut);font-size:13px;padding:0 12px">No folders yet</span>';
+  $("tg").innerHTML=Object.keys(tags).sort().map(t=>`<button class="tg" data-t="${esc(t)}" aria-pressed="${V.tag===t}">#${esc(t)} ${tags[t]}</button>`).join("")||'<span style="color:var(--mut);font-size:13px">No tags yet</span>';
+  $("fl").innerHTML=folders.map(f=>`<option value="${esc(f)}">`).join("");
+  let r=B.filter(b=>(V.nav!=="fav"||b.fav)&&(V.nav!=="rec"||b.last)&&(!V.folder||b.folder===V.folder)&&(!V.tag||b.tags.includes(V.tag)));
+  const q=V.q.trim().toLowerCase();if(q)r=r.filter(b=>(b.title+" "+b.url+" "+b.desc+" "+b.folder+" "+b.tags.join(" ")).toLowerCase().includes(q));
+  r.sort(V.nav==="rec"?(a,b)=>b.last-a.last:V.sort==="old"?(a,b)=>a.added-b.added:V.sort==="az"?(a,b)=>a.title.localeCompare(b.title):V.sort==="vis"?(a,b)=>b.visits-a.visits:(a,b)=>b.added-a.added);
+  $("ttl").textContent=V.tag?"#"+V.tag:V.folder||(V.nav==="fav"?"Favorites":V.nav==="rec"?"Recently visited":"All bookmarks");
+  $("cnt").textContent=r.length+" of "+B.length+" bookmark"+(B.length===1?"":"s")+(q?` matching “${V.q.trim()}”`:"");
+  $("gr").className="grid"+(V.list?" list":"");$("vw").textContent=V.list?"Grid":"List";
+  $("gr").innerHTML=r.length?r.map(b=>{const h=host(b.url);return `<article class="c"><div class="top"><div class="av" style="background:hsl(${hue(h)} 55% 45%)">${esc((b.title||h)[0].toUpperCase())}</div><a href="${esc(b.url)}" target="_blank" rel="noopener noreferrer" data-v="${b.id}"><b>${esc(b.title)}</b><small>${esc(h)}</small></a><button class="star" data-s="${b.id}" aria-pressed="${b.fav}" aria-label="${b.fav?"Remove from favorites":"Add to favorites"}">${b.fav?"★":"☆"}</button></div>${b.desc?`<p>${esc(b.desc)}</p>`:""}<div class="cf"><div class="tags">${b.folder?`<span class="tg" data-f="${esc(b.folder)}">▸ ${esc(b.folder)}</span>`:""}${b.tags.map(t=>`<span class="tg" data-t="${esc(t)}">#${esc(t)}</span>`).join("")}</div><div class="ac2"><span>${b.visits} visit${b.visits===1?"":"s"}</span><button data-e="${b.id}" aria-label="Edit">Edit</button><button class="dl" data-d="${b.id}" aria-label="Delete">Delete</button></div></div></article>`}).join(""):`<div class="empty"><b>${B.length?"Nothing matches":"No bookmarks yet"}</b>${B.length?"Try another search, folder or tag.":"Press + Add to save your first link."}</div>`}
+
+/* events */
+document.addEventListener("click",e=>{
+  const n=e.target.closest("[data-n]"),f=e.target.closest("[data-f]"),t=e.target.closest("[data-t]"),s=e.target.closest("[data-s]"),ed_=e.target.closest("[data-e]"),dl=e.target.closest("[data-d]"),v=e.target.closest("[data-v]");
+  if(n){V.nav=n.dataset.n;V.folder="";V.tag="";render()}
+  else if(f){V.folder=V.folder===f.dataset.f?"":f.dataset.f;V.nav="all";V.tag="";render()}
+  else if(t){V.tag=V.tag===t.dataset.t?"":t.dataset.t;V.nav="all";V.folder="";render()}
+  else if(s){const b=B.find(x=>x.id===s.dataset.s);b.fav=!b.fav;save();render()}
+  else if(ed_)openForm(B.find(x=>x.id===ed_.dataset.e));
+  else if(dl){const i=B.findIndex(x=>x.id===dl.dataset.d),b=B[i];B.splice(i,1);save();render();toast("Bookmark deleted",()=>{B.splice(i,0,b);save();render()})}
+  else if(v){const b=B.find(x=>x.id===v.dataset.v);b.visits++;b.last=Date.now();save();setTimeout(render,50)}
+  else if(e.target.closest("[data-x]"))e.target.closest("dialog").close()});
+$("q").oninput=e=>{V.q=e.target.value;render()};$("so").onchange=e=>{V.sort=e.target.value;render()};
+$("vw").onclick=()=>{V.list=!V.list;try{localStorage.setItem("markly-list",V.list?"1":"")}catch(e){}render()};
+addEventListener("keydown",e=>{const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);if(e.key==="/"&&!typing){e.preventDefault();$("q").focus()}else if(e.key==="n"&&!typing&&!document.querySelector("dialog[open]")){e.preventDefault();openForm()}});
+
+/* add and edit */
+function openForm(b){ed=b||null;$("dt").textContent=b?"Edit bookmark":"Add bookmark";$("fu").value=b?b.url:"";$("ft").value=b?b.title:"";$("ff").value=b?b.folder:(V.folder||"");$("fg").value=b?b.tags.join(", "):"";$("fn").value=b?b.desc:"";$("er").textContent="";$("dlg").showModal();$("fu").focus()}
+$("add").onclick=()=>openForm();
+$("fm").onsubmit=e=>{e.preventDefault();const x=norm($("fu").value);
+  if(!x){$("er").textContent="Enter a valid link, such as example.com/page.";return}
+  if(B.some(b=>b!==ed&&key(norm(b.url))===key(x))){$("er").textContent="You already saved this link.";return}
+  const o={url:x.href,title:$("ft").value.trim()||x.hostname.replace(/^www\./,""),folder:$("ff").value.trim(),tags:[...new Set($("fg").value.split(",").map(t=>t.trim().toLowerCase().replace(/^#/,"")).filter(Boolean))],desc:$("fn").value.trim()};
+  if(ed)Object.assign(ed,o);else B.unshift({id:"b"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),fav:false,visits:0,added:Date.now(),last:0,...o});
+  save();$("dlg").close();render();toast(ed?"Bookmark updated":"Bookmark saved")};
+
+/* backup */
+function dump(){return JSON.stringify(B,null,2)}
+$("bk").onclick=()=>{$("bt").value=dump();$("be").textContent="";$("bd").showModal()};
+$("bc").onclick=()=>{const t=$("bt");t.select();let ok=false;try{ok=document.execCommand("copy")}catch(x){}(navigator.clipboard?navigator.clipboard.writeText(t.value).then(()=>1,()=>ok):Promise.resolve(ok)).then(()=>toast("Backup copied"))};
+$("bd2").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([dump()],{type:"application/json"}));a.download="markly-backup.json";document.body.appendChild(a);a.click();a.remove();toast("Download started")};
+function imp(txt){let a;try{a=JSON.parse(txt)}catch(e){$("be").textContent="That is not valid JSON.";return}
+  if(!Array.isArray(a)){$("be").textContent="Expected a list of bookmarks.";return}
+  let n=0;a.forEach(o=>{const x=o&&norm(String(o.url||""));if(!x||B.some(b=>key(norm(b.url))===key(x)))return;
+    B.push({id:"i"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),url:x.href,title:String(o.title||x.hostname).slice(0,200),folder:String(o.folder||"").slice(0,60),tags:Array.isArray(o.tags)?o.tags.map(String).slice(0,12):[],desc:String(o.desc||"").slice(0,500),fav:!!o.fav,visits:+o.visits||0,added:+o.added||Date.now(),last:+o.last||0});n++});
+  save();render();$("be").textContent="";$("bt").value=dump();toast(n+" bookmark"+(n===1?"":"s")+" imported")}
+$("bi").onclick=()=>imp($("bt").value);$("bf").onclick=()=>$("fi").click();
+$("fi").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>imp(String(r.result));r.readAsText(f);e.target.value=""};
+
+/* theme and start */
+$("th").onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark";try{localStorage.setItem("markly-theme",r.dataset.theme)}catch(e){}};
+try{const t=localStorage.getItem("markly-theme");if(t)document.documentElement.dataset.theme=t;V.list=!!localStorage.getItem("markly-list")}catch(e){}
+render();
+</script>
+</body>
+</html>
